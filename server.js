@@ -27,10 +27,33 @@
         const new_book = req.body;
         new_book.id = bookDatabase.length + 1
         new_book.bookId = uuidv4();
-        new_book.created_at = Date.now();
-        new_book.updatedAt = Date.now();
+        new_book.createdAt = new Date();
+        new_book.updatedAt = new Date()
         bookDatabase.push(new_book);
         return res.status(200).json('{Status: Done!}');
+    })
+
+    //update nude
+    app.put('/books/', (req, res) => {
+        const updateBook = req.body;
+        let indexBook = bookDatabase.findIndex(books => books.id === updateBook.id);
+
+        bookDatabase[indexBook] = updateBook;
+
+
+        return res.status(200).json('{Status: Updated!}');
+    })
+
+    //delete nude
+    app.delete('/books/:bookId', (req, res) => {
+        let id = req.params.id;
+        let indexBook = bookDatabase.findIndex(books => books.id === id);
+
+
+        delete bookDatabase[indexBook];
+        //bookDatabase[indexBook] = [indexBook].splice(indexBook);
+
+        return  res.status(200).json('{Status: Deleted!}');
     })
 
     app.get('/books/', (req, res) => {
