@@ -46,12 +46,9 @@
 
     //delete nude
     app.delete('/books/:bookId', (req, res) => {
-        let id = req.params.id;
-        let indexBook = bookDatabase.findIndex(books => books.id === id);
-
-
-        delete bookDatabase[indexBook];
-        //bookDatabase[indexBook] = [indexBook].splice(indexBook);
+        const id = parseInt(req.params.bookId)
+        const index = bookDatabase.findIndex(books => books.id === id);
+        bookDatabase.splice(index, 1);
 
         return  res.status(200).json('{Status: Deleted!}');
     })
