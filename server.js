@@ -1,36 +1,31 @@
     const express =  require('express')
     const { v4: uuidv4 } = require('uuid');
+    const mongoose = require('mongoose');
+    const bookModel = require("./models/book.model");
     require('dotenv').config()
 
     const app = express()
     const port = process.env.PORT || 3000
 
-    // This is example structure of book
-    const exampleBook = {
-        id: 1,
-        title: "book title",
-        author: "book author",
-        bookId: "book-uuid-1",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+    //database MongoDB
+    try {
+        await mongoose.connect(`mongodb://localhost:${port}/bookDatabase`, {
+            useNewUrlParser: true
+        });
+    } catch (err) {
+        console.error("Connect to mongodb server failed:", err);
+        process.exit(1);
     }
-
-    // This is list act like database for collect are books
-    const bookDatabase = [
-        exampleBook
-    ]
 
     app.use(express.json());
 
     //send nude
-    app.post('/books/', (req, res) => {
-        const new_book = req.body;
-        new_book.id = bookDatabase.length + 1
-        new_book.bookId = uuidv4();
-        new_book.createdAt = new Date();
-        new_book.updatedAt = new Date()
-        bookDatabase.push(new_book);
-        return res.status(200).json('{Status: Done!}');
+    app.post('/books/', async (req, res) => {
+        const bookData = new bookModel(req.body);
+        await bookData.validate();
+
+        const bookDocument = await bookModel.create(bookData);
+        res.send(bookDocument);
     })
 
     //update nude
